@@ -1,9 +1,5 @@
 import sys
-from scapy.all import * 
 from bitsbehumble import *
-from pwn import *  
-
-from bitsbehumble import * 
 
 def print_usage():
     print("Usage:")
@@ -134,8 +130,6 @@ def main(argv,argc):
         sys.exit(2)
     add_comment(pcap_file,packet_number, argv[2]) if argc == 3 else read_comment(pcap_file,packet_number)    
 
-     
-    
     
 if __name__ == "__main__":
     main(sys.argv[1:],len(sys.argv[1:]))
