@@ -31,17 +31,13 @@ def get_blocks(pcapng):
 
 def pad(x):
     
-    if len(x) ==1:
-        x=x.zfill(2)
-    elif len(x) == 3:
-        x=x.zfill(4)
-    
+   while len(x) % 4 !=0:
+        x=x.zfill(len(x)+1)
     x = hexstring_to_array(x)
-    new_x = x
-    while len(new_x)!=4:
-        new_x.append("0x00")
+    
+    while len(x)!=4:
+        x.append("0x00")
     return new_x
-
 
 def add_comment(pcap_file,packet_number,text):
 
