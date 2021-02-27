@@ -31,7 +31,7 @@ def get_blocks(pcapng):
 
 def pad(x):
     
-   while len(x) % 4 !=0:
+    while len(x) % 4 !=0:
         x=x.zfill(len(x)+1)
     x = hexstring_to_array(x)
     
@@ -39,13 +39,13 @@ def pad(x):
         x.append("0x00")
     return new_x
 
-def add_comment(pcap_file,packet_number,text):
+
+def add_comment(pcap_file,packet_number,comment):
 
     with open(pcap_file,"rb") as f:
         pcapng = f.read()
         f.close()
-
-    comment = text
+    
     blocks = get_blocks(pcapng)
     enhanced_blocks = blocks[0]
     all_blocks = blocks[1]
@@ -57,11 +57,10 @@ def add_comment(pcap_file,packet_number,text):
     while len(new_option) %4 !=0: 
         new_option.append("0x00")
 
-    # 3 zeros at the begging, 5 zeros at te end
-    # get the number of this specific enhanced block in all blocks
+    # get the index of this specific enhanced block in all blocks
     block_index = all_blocks.index(enhanced_blocks[packet_number-1])
 
-    # overwrite the block length
+    # edit the block length
     cur_block = all_blocks[block_index] 
     block_length = hexarr_to_hexstring(cur_block[4:8])[2:]
 
@@ -69,18 +68,18 @@ def add_comment(pcap_file,packet_number,text):
 
     new_length = pad(hex(int(block_length,16) + len(new_option))[2:])
 
-    #overwrite blcok length
+    #overwrite block length
     cur_block[4:8] = new_length
         
     # insert the new option in the existing enhanced_block
     for _byte in new_option: 
         cur_block.insert(-7,_byte) # 3 bytes for the opt_endofopt and 4 for the total block length
     cur_block[-4:] = new_length
+
     # write to the output file
     with open('output.pcapng',"wb") as new_pcapng:
         for block in all_blocks:
             block = hex_to_bytes(block)
-            
             new_pcapng.write(bytes(block))
         new_pcapng.close()
     print("[+] comment added to output.pcapng in the current working directory")
@@ -97,11 +96,10 @@ def read_comment(pcap_file,packet_number):
     block = blocks[packet_number-1]
 
     captured_len = int(hexarr_to_hexstring(block[20:24])[2:].replace("00",""),16)
-    #options field is at offset 24 of each block and is of variable length
     #subtracting 4 to remove the block total length that marks the end of a block
     options_field = block[captured_len-4:]
+
     i=0
-   
     while  i < len(options_field):
         _byte=options_field[i][2:] # remove 0x 
         if _byte ==  "01" and options_field[i+1]=="0x00":
@@ -118,12 +116,10 @@ def main(argv,argc):
         print_usage()
         sys.exit(2)
 
-    try:
-        pcap_file  = argv[0]
-        packet_number = int(argv[1])
-    except:
-        print("Invalid File")
-        sys.exit(2)
+   
+    pcap_file  = argv[0]
+    packet_number = int(argv[1])
+    
     add_comment(pcap_file,packet_number, argv[2]) if argc == 3 else read_comment(pcap_file,packet_number)    
 
     
