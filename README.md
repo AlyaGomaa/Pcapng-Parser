@@ -8,13 +8,13 @@ bitsbehumble library (my library) is required to do the hex and bytes coversions
 
 to add a comment text  : 
 
-```editor.py <pcapngfile> <packetnumber> <comment>```
+```python3 editor.py <pcapngfile> <packetnumber> <comment>```
 
-```editor.py sample.pcapng 1 "Hello"```
+```python3 editor.py sample.pcapng 1 "Hello"```
 
 to read a comment      : 
 
-```editor.py <pcapngfile> <packetnumber>```
+```python3 editor.py <pcapngfile> <packetnumber>```
 
-```editor.py sample.pcapng 1```
+```python3 editor.py sample.pcapng 1```
 
